@@ -10,6 +10,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "knex": "^3.2.10",
+    "mysql2": "^3.22.4",
+    "prompt-sync": "^4.2.0",
+    "sqlite3": "^6.0.1"
   }
 }
