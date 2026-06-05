@@ -18,7 +18,7 @@ import Usuario from './models/Usuario.js'
 import UsuarioDAO from './daos/UsuarioDAO.js'
 
 import promptSync from 'prompt-sync'
-const prompt = promptSync()
+//const prompt = promptSync()
 const dao = await UsuarioDAO.build()
 
 async function inserUser() {
@@ -33,6 +33,16 @@ async function inserUser() {
 
 await inserUser()
 //==============================  TESTE DO USUARIO DAO   ========================================
+
+
+//==============================  TESTE DA IMPORTAÇÂO   ========================================
+import { signup_email, signup_nome, signup_senha, signup_tipo } from '../frontend/script.js'
+
+await dao.insert(new Usuario(null, signup_email, signup_nome, signup_senha, signup_tipo))
+
+
+
+//==============================  TESTE DA IMPORTAÇÂO   ========================================
 
 
 //==============================  TESTE DA CLASSE FILMES   ========================================
