@@ -1,8 +1,7 @@
-// ─── Variáveis globais expostas ───────────────────────────────────────────────
+// ─── Variáveis globais ────────────────────────────────────────────────────────
 let email = '';
 let senha = '';
 
-// Variáveis de cadastro
 let signup_nome  = '';
 let signup_email = '';
 let signup_senha = '';
@@ -55,7 +54,7 @@ function isEmailValid(v) {
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const emailVal = document.getElementById('login-email').value.trim();
   const senhaVal = document.getElementById('login-senha').value;
@@ -76,7 +75,7 @@ function handleLogin(e) {
 
   if (!valid) return;
 
-  // ✅ Armazenando nas variáveis globais
+  // Armazenando nas variáveis globais
   email = emailVal;
   senha = senhaVal;
 
@@ -87,16 +86,31 @@ function handleLogin(e) {
     `<p>senha: <span class="val">"${senha}"</span></p>`;
   dbg.classList.add('visible');
 
-  showToast('Login realizado com sucesso!', 'success');
+  // Enviando para o servidor
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
 
-  // 👉 Aqui você conecta ao banco de dados:
-  // verificarUsuario(email, senha);
-  console.log('Login → email:', email, '| senha:', senha);
+    const data = await res.json();
+
+    if (res.ok) {
+      showToast('Login realizado com sucesso!', 'success');
+      // window.location.href = '/dashboard.html';
+    } else {
+      showToast(data.erro || 'Email ou senha incorretos.', 'error-t');
+    }
+  } catch (err) {
+    showToast('Erro de conexão com o servidor.', 'error-t');
+    console.error(err);
+  }
 }
 
 // ─── Signup ───────────────────────────────────────────────────────────────────
 
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
   const nomeVal  = document.getElementById('signup-nome').value.trim();
   const emailVal = document.getElementById('signup-email').value.trim();
@@ -125,12 +139,11 @@ function handleSignup(e) {
 
   if (!valid) return;
 
-  // ✅ Armazenando nas variáveis globais
+  // Armazenando nas variáveis globais
   signup_nome  = nomeVal;
   signup_email = emailVal;
   signup_senha = senhaVal;
   signup_tipo  = tipoVal;
-
 
   // Debug panel
   const dbg = document.getElementById('debug-panel');
@@ -141,17 +154,34 @@ function handleSignup(e) {
     `<p>signup_tipo:  <span class="val">"${signup_tipo}"</span></p>`;
   dbg.classList.add('visible');
 
-  showToast('Conta criada com sucesso!', 'success');
+  // Enviando para o servidor
+  try {
+    const res = await fetch('/cadastrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: signup_email,
+        nome:  signup_nome,
+        senha: signup_senha,
+        tipo:  signup_tipo
+      })
+    });
 
-  // 👉 Aqui você conecta ao banco de dados:
-  // criarUsuario(signup_nome, signup_email, signup_senha, signup_tipo);
-  console.log('Signup →', { signup_nome, signup_email, signup_senha, signup_tipo });
+    const data = await res.json();
+
+    if (res.ok) {
+      showToast('Conta criada com sucesso!', 'success');
+    } else {
+      showToast(data.erro || 'Erro ao cadastrar.', 'error-t');
+    }
+  } catch (err) {
+    showToast('Erro de conexão com o servidor.', 'error-t');
+    console.error(err);
+  }
 }
 
+// ─── Expõe funções para o HTML (necessário com type="module") ─────────────────
 window.handleLogin  = handleLogin;
 window.handleSignup = handleSignup;
 window.switchTab    = switchTab;
 window.togglePw     = togglePw;
-
-// Expõe variáveis para outros módulos
-export { signup_nome, signup_email, signup_senha, signup_tipo, email, senha };
