@@ -38,6 +38,12 @@ export default class UsuarioDAO {
         }
     }
 
+    async getByEmail(email) {
+        const r = await db('usuario').where('email', email).first()
+        if (r) return new Usuario(r.id, r.email, r.nome, r.senha, r.acesso)
+        return null
+    }
+
     async insert(usuario) {
 
         await db('usuario').insert({
@@ -51,13 +57,13 @@ export default class UsuarioDAO {
 
     async getAll() {
         const rows = await db('usuario').select('*')
-        return rows.map(r => new Filme(r.email, r.nome, r.senha, r.acesso, r.id))
+        return rows.map(r => new Usuario(r.email, r.nome, r.senha, r.acesso, r.id))
     }
 
     async getById(id) {
         const r = await db('usuario').where('id', id).first()
 
-        if (r) return new Filme(r.email, r.nome, r.senha, r.acesso, r.id)
+        if (r) return new Usuario(r.email, r.nome, r.senha, r.acesso, r.id)
 
         return null
     }

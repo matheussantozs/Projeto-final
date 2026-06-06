@@ -1,52 +1,63 @@
 import express from 'express'
-const app = express()
-const PORT = 3000
-
-//======================= SERVIDOR =============================
-//app.get('/', (req, res) => {
-//    res.send('Servidor OK')
-//})
-
-//app.listen(PORT, () => {
-//  console.log(`Servidor rodando em http://localhost:${PORT}`);
-//});
-//======================= SERVIDOR =============================
-
-
-//==============================  TESTE DO USUARIO DAO   ========================================
+import path from 'path'
+import { fileURLToPath } from 'url'
 import Usuario from './models/Usuario.js'
 import UsuarioDAO from './daos/UsuarioDAO.js'
 
-import promptSync from 'prompt-sync'
-//const prompt = promptSync()
+const app = express()
+const PORT = 3000
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+app.use(express.json())
+
+// serve os arquivos da pasta frontend
+app.use(express.static(path.join(__dirname, '../frontend')))
+
 const dao = await UsuarioDAO.build()
 
-async function inserUser() {
-    const email = prompt('Email: ')
-    const nome = prompt('Nome: ')
-    const senha    = prompt('senha: ')
-    const acesso   = prompt('acesso: ')
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'))
+})
 
-  await dao.insert(new Usuario(null, email, nome, senha, acesso))
-    console.log('Usuário cadastrado')
-}
+app.post('/cadastrar', async (req, res) => {
+  const { email, nome, senha, tipo } = req.body
 
-await inserUser()
-//==============================  TESTE DO USUARIO DAO   ========================================
+  if (!email || !nome || !senha || !tipo) {
+    return res.status(400).json({ erro: 'Campos não preenchidos' })
+  }
 
+  try {
+    await dao.insert(new Usuario(null, email, nome, senha, tipo))
+    res.status(201).json({ mensagem: 'Usuário cadastrado com sucesso!' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ erro: 'Erro ao cadastrar usuário.' })
+  }
+})
 
-//==============================  TESTE DA IMPORTAÇÂO   ========================================
-import { signup_email, signup_nome, signup_senha, signup_tipo } from '../frontend/script.js'
+app.post('/login', async (req, res) => {
+  const { email, senha } = req.body
 
-await dao.insert(new Usuario(null, signup_email, signup_nome, signup_senha, signup_tipo))
+  if (!email || !senha) {
+    return res.status(400).json({ erro: 'Email e senha obrigatórios.' })
+  }
 
+  try {
+    const usuario = await dao.getByEmail(email)
 
+    if (!usuario || usuario.senha != senha) {
+      return res.status(401).json({ erro: 'Email ou senha incorretos.' })
+    }
 
-//==============================  TESTE DA IMPORTAÇÂO   ========================================
+    res.json({ mensagem: 'Login realizado com sucesso!', usuario })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ erro: 'Erro ao realizar login.' })
+  }
+})
 
-
-//==============================  TESTE DA CLASSE FILMES   ========================================
-//import Filme from './models/Filme.js'
-//const f1 = new Filme(1, 2006, "Vingadores", "Super herois fortes", "Irmão sla", "Ficção", "https:/slaaaa")
-//console.log(f1.titulo)
-//==============================  TESTE DA CLASSE FILMES   ========================================
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`)
+})
