@@ -57,13 +57,13 @@ export default class UsuarioDAO {
 
     async getAll() {
         const rows = await db('usuario').select('*')
-        return rows.map(r => new Usuario(r.email, r.nome, r.senha, r.acesso, r.id))
+        return rows.map(r => new Usuario(r.id, r.email, r.nome, r.senha, r.acesso))
     }
 
     async getById(id) {
         const r = await db('usuario').where('id', id).first()
 
-        if (r) return new Usuario(r.email, r.nome, r.senha, r.acesso, r.id)
+        if (r) return new Usuario(r.id, r.email, r.nome, r.senha, r.acesso )
 
         return null
     }

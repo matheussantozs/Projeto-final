@@ -21,6 +21,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'))
 })
 
+
+
 app.post('/cadastrar', async (req, res) => {
   const { email, nome, senha, tipo } = req.body
 
@@ -36,6 +38,7 @@ app.post('/cadastrar', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao cadastrar usuário.' })
   }
 })
+
 
 app.post('/login', async (req, res) => {
   const { email, senha } = req.body
@@ -55,6 +58,18 @@ app.post('/login', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ erro: 'Erro ao realizar login.' })
+  }
+})
+
+
+app.delete('/usuario/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    await dao.delete(id)
+    res.json({mensagem: 'Usuario deletado'})
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({error :  'Erro ao deletar'})
   }
 })
 
