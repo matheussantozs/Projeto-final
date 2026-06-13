@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pobre Play — Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="catalogo.css" />
+</head>
+<body class="app-body">
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">Pobre Play</span>
+      <h1>Filmes disponíveis</h1>
+    </div>
+    <button class="btn-secondary" id="btn-logout">Sair</button>
+  </header>
+
+  <main class="catalogo-container">
+    <section class="hero-play">
+      <div>
+        <span class="badge">Catálogo</span>
+        <h2>Escolha um filme para ver os detalhes</h2>
+      </div>
+    </section>
+
+    <section class="movie-grid" id="movie-grid"></section>
+  </main>
+
+  <dialog class="movie-modal" id="movie-modal">
+    <button class="modal-close" id="modal-close">×</button>
+    <img id="modal-img" alt="Capa do filme" />
+    <div>
+      <h2 id="modal-title"></h2>
+      <p class="movie-meta" id="modal-meta"></p>
+      <p id="modal-sinopse"></p>
+    </div>
+  </dialog>
+
+  <script type="module" src="catalogo.js"></script>
+</body>
+</html>

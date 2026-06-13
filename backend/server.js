@@ -1,78 +1,54 @@
+import 'dotenv/config'
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import Usuario from './models/Usuario.js'
 import UsuarioDAO from './daos/UsuarioDAO.js'
+import FilmeDAO from './daos/FilmeDAO.js'
+import AuthController from './controllers/authController.js'
+import FilmeController from './controllers/filmeController.js'
+import authRoutes from './routes/authRoutes.js'
+import filmeRoutes from './routes/filmeRoutes.js'
+import { ensureBucket } from './services/minioService.js'
 
 const app = express()
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 app.use(express.json())
-
-// serve os arquivos da pasta frontend
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, '../frontend')))
 
-const dao = await UsuarioDAO.build()
+const usuarioDAO = await UsuarioDAO.build()
+const filmeDAO = await FilmeDAO.build()
+
+try {
+  await ensureBucket()
+  console.log('Bucket do MinIO configurado para leitura pública.')
+} catch (error) {
+  console.warn('Não foi possível configurar o MinIO na inicialização:', error.message)
+}
+
+const authController = new AuthController(usuarioDAO)
+const filmeController = new FilmeController(filmeDAO)
+
+app.use('/api/auth', authRoutes(authController))
+app.use('/api/filmes', filmeRoutes(filmeController))
+
+app.post('/cadastrar', authController.cadastrar)
+app.post('/login', authController.login)
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'))
 })
 
-
-
-app.post('/cadastrar', async (req, res) => {
-  const { email, nome, senha, tipo } = req.body
-
-  if (!email || !nome || !senha || !tipo) {
-    return res.status(400).json({ erro: 'Campos não preenchidos' })
-  }
-
-  try {
-    await dao.insert(new Usuario(null, email, nome, senha, tipo))
-    res.status(201).json({ mensagem: 'Usuário cadastrado com sucesso!' })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ erro: 'Erro ao cadastrar usuário.' })
-  }
-})
-
-
-app.post('/login', async (req, res) => {
-  const { email, senha } = req.body
-
-  if (!email || !senha) {
-    return res.status(400).json({ erro: 'Email e senha obrigatórios.' })
-  }
-
-  try {
-    const usuario = await dao.getByEmail(email)
-
-    if (!usuario || usuario.senha != senha) {
-      return res.status(401).json({ erro: 'Email ou senha incorretos.' })
-    }
-
-    res.json({ mensagem: 'Login realizado com sucesso!', usuario })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ erro: 'Erro ao realizar login.' })
-  }
-})
-
-
-app.delete('/usuario/:id', async (req, res) => {
-  const { id } = req.params
-  try {
-    await dao.delete(id)
-    res.json({mensagem: 'Usuario deletado'})
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({error :  'Erro ao deletar'})
-  }
+app.use((err, req, res, next) => {
+  console.error(err)
+  return res.status(400).json({ erro: err.message || 'Erro na requisição.' })
 })
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)
 })
+

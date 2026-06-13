@@ -33,7 +33,7 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Background film-reel decorative circles */
@@ -422,3 +422,22 @@ input.error, select.error {
 }
 .debug p { margin: 2px 0; }
 .debug .val { color: var(--white); }
+
+.btn-secondary {
+  border: 1.5px solid rgba(255,255,255,.25);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.12);
+  color: inherit;
+  padding: .75rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.admin-card .btn-secondary,
+.table-panel .btn-secondary,
+.form-panel .btn-secondary {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+  color: var(--gray-900);
+}

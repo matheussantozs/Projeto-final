@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineBase — Administração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="app-body">
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">Área administrativa</span>
+      <h1>Gerenciar filmes</h1>
+      <p>CRUD completo com rotas protegidas por JWT.</p>
+    </div>
+    <button class="btn-secondary" id="btn-logout">Sair</button>
+  </header>
+
+  <main class="admin-container">
+    <section class="admin-card form-panel">
+      <h2 id="form-title">Cadastrar filme</h2>
+      <form id="form-filme" class="admin-form">
+        <input type="hidden" id="filme-id" />
+
+        <label>Título
+          <input type="text" id="titulo" required />
+        </label>
+
+        <label>Ano
+          <input type="number" id="ano" min="1888" max="2035" required />
+        </label>
+
+        <label>Diretor
+          <input type="text" id="diretor" required />
+        </label>
+
+        <label>Gênero
+          <input type="text" id="genero" required />
+        </label>
+
+        <label>Sinopse
+          <textarea id="sinopse" rows="5" required></textarea>
+        </label>
+
+        <label>Capa do filme
+          <input type="file" id="capa" accept="image/*" />
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Salvar</button>
+          <button type="button" class="btn-secondary" id="btn-cancelar">Cancelar</button>
+        </div>
+      </form>
+      <p class="form-message" id="form-message"></p>
+    </section>
+
+    <section class="admin-card table-panel">
+      <div class="table-header">
+        <h2>Filmes cadastrados</h2>
+        <button class="btn-secondary" id="btn-recarregar">Recarregar</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Capa</th>
+              <th>Título</th>
+              <th>Ano</th>
+              <th>Gênero</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="filmes-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

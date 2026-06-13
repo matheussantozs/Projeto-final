@@ -1,89 +1,71 @@
-import knex from 'knex'
+import db from '../config/database.js'
+import BaseDAO from './BaseDAO.js'
 import Usuario from '../models/Usuario.js'
 
-const db = knex({
-    client: 'sqlite3',
-    connection: { filename: 'Usuario.db' },
-    useNullAsDefault: true
-})
+export default class UsuarioDAO extends BaseDAO {
+  constructor() {
+    super(db, 'usuario')
+  }
 
-export default class UsuarioDAO {
+  static async build() {
+    await UsuarioDAO.createTable()
+    return new UsuarioDAO()
+  }
 
-    static #privateConstructor = false
-    constructor() {
-        if (!UsuarioDAO.#privateConstructor)
-            throw new Error("Use UsuarioDAO.build()")
+  static async createTable() {
+    const existe = await db.schema.hasTable('usuario')
+
+    if (!existe) {
+      await db.schema.createTable('usuario', (table) => {
+        table.increments('id').primary()
+        table.string('email', 100).notNullable().unique()
+        table.string('nome', 100).notNullable()
+        table.string('senha', 255).notNullable()
+        table.string('acesso', 30).notNullable().defaultTo('COMUM')
+      })
     }
+  }
 
-    static async build() {
-        await UsuarioDAO.#createTable()
+  #toModel(row) {
+    return row ? new Usuario(row.id, row.email, row.nome, row.senha, row.acesso) : null
+  }
 
-        UsuarioDAO.#privateConstructor = true   // abre o portão temporariamente
-        const dao = new UsuarioDAO()             // agora o constructor deixa passar
-        UsuarioDAO.#privateConstructor = false   // fecha o portão de volta
-        return dao                             // entrega o DAO pronto para uso
-    }
+  async insert(usuario) {
+    const [id] = await this.db(this.tableName).insert({
+      email: usuario.email,
+      nome: usuario.nome,
+      senha: usuario.senha,
+      acesso: usuario.acesso
+    })
+    return this.getById(id)
+  }
 
-    static async #createTable() {
-        const existe = await db.schema.hasTable('usuario')
+  async getByEmail(email) {
+    const row = await this.db(this.tableName).where({ email }).first()
+    return this.#toModel(row)
+  }
 
-        if (!existe) {
-            await db.schema.createTable('usuario', (table) => {
-                table.increments('id')
-                table.string('email', 100)
-                table.string('nome', 100)
-                table.string('senha')
-                table.string('acesso')
-            })
-        }
-    }
+  async getById(id) {
+    const row = await this.db(this.tableName).where({ id }).first()
+    return this.#toModel(row)
+  }
 
-    async getByEmail(email) {
-        const r = await db('usuario').where('email', email).first()
-        if (r) return new Usuario(r.id, r.email, r.nome, r.senha, r.acesso)
-        return null
-    }
+  async getAll() {
+    const rows = await this.db(this.tableName).select('*').orderBy('nome')
+    return rows.map(row => this.#toModel(row))
+  }
 
-    async insert(usuario) {
+  async update(usuario) {
+    await this.db(this.tableName).where({ id: usuario.id }).update({
+      email: usuario.email,
+      nome: usuario.nome,
+      senha: usuario.senha,
+      acesso: usuario.acesso
+    })
+    return this.getById(usuario.id)
+  }
 
-        await db('usuario').insert({
-            email: usuario.email,   
-            nome: usuario.nome,
-            senha: usuario.senha,
-            acesso: usuario.acesso
-
-        })
-    }
-
-    async getAll() {
-        const rows = await db('usuario').select('*')
-        return rows.map(r => new Usuario(r.id, r.email, r.nome, r.senha, r.acesso))
-    }
-
-    async getById(id) {
-        const r = await db('usuario').where('id', id).first()
-
-        if (r) return new Usuario(r.id, r.email, r.nome, r.senha, r.acesso )
-
-        return null
-    }
-
-    async update(usuario) {
-
-        await db('usuario').where('id', usuario.id).update({
-
-            email: usuario.email,
-            nome: usuario.nome,
-            senha: usuario.senha,
-            acesso: usuario.acesso
-        })
-    }
-
-    async delete(id) {
-        await db('usuario').where('id', id).delete()
-    }
-
-    static async close() {
-        await db.destroy()
-    }
+  async updatePassword(id, senhaHash) {
+    await this.db(this.tableName).where({ id }).update({ senha: senhaHash })
+  }
 }

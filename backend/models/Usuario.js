@@ -1,25 +1,31 @@
-export default class Usuario {
-    #id
-    #email
-    #nome
-    #senha
-    #acesso
+import Pessoa from './Pessoa.js'
 
-    constructor(id, email, nome, senha, acesso = 'COMUM') {
-        this.#id    = id
-        this.#email = email
-        this.#nome  = nome
-        this.#senha = senha
-        this.#acesso = acesso
+export default class Usuario extends Pessoa {
+  #senha
+  #acesso
+
+  constructor(id, email, nome, senha, acesso = 'COMUM') {
+    super(id, nome, email)
+    this.#senha = senha
+    this.#acesso = acesso || 'COMUM'
+  }
+
+  get senha() {
+    return this.#senha
+  }
+
+  get acesso() {
+    return this.#acesso
+  }
+
+  isAdmin() {
+    return this.#acesso === 'ADMINISTRADOR'
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      acesso: this.#acesso
     }
-
-    get id()     { return this.#id }
-    get email()  { return this.#email }
-    get nome()   { return this.#nome }
-    get senha()  { return this.#senha }
-    get acesso() { return this.#acesso }
-
-    isAdmin() {
-        return this.#acesso === 'ADMINISTRADOR'
-    }
+  }
 }
