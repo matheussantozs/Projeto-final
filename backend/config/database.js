@@ -10,7 +10,12 @@ const db = knex({
   connection: {
     filename: path.join(__dirname, '../Usuario.db')
   },
-  useNullAsDefault: true
+  useNullAsDefault: true,
+  pool: {
+    afterCreate(connection, done) {
+      connection.run('PRAGMA foreign_keys = ON', done)
+    }
+  }
 })
 
 export default db

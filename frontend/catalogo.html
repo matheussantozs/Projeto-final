@@ -24,21 +24,50 @@
       <div>
         <span class="badge">Catálogo</span>
         <h2>Escolha um filme para ver os detalhes</h2>
+        <p>Clique em um card para abrir as informações ou use a estrela para salvar o filme.</p>
       </div>
     </section>
 
-    <section class="movie-grid" id="movie-grid"></section>
+    <section class="catalog-toolbar" aria-label="Opções do catálogo">
+      <div>
+        <span class="eyebrow">Sua biblioteca</span>
+        <h2 id="catalog-title">Todos os filmes</h2>
+        <p id="catalog-description">Explore todos os filmes cadastrados.</p>
+      </div>
+
+      <div class="view-switch" role="tablist" aria-label="Visualização dos filmes">
+        <button class="view-button active" type="button" data-view="todos" role="tab" aria-selected="true">
+          Todos <span id="count-todos">0</span>
+        </button>
+        <button class="view-button" type="button" data-view="favoritos" role="tab" aria-selected="false">
+          ★ Favoritos <span id="count-favoritos">0</span>
+        </button>
+      </div>
+    </section>
+
+    <p class="catalog-status" id="catalog-status" role="status" aria-live="polite"></p>
+    <section class="movie-grid" id="movie-grid" aria-live="polite"></section>
   </main>
 
-  <dialog class="movie-modal" id="movie-modal">
-    <button class="modal-close" id="modal-close">×</button>
+  <dialog class="movie-modal" id="movie-modal" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" type="button" aria-label="Fechar detalhes">×</button>
     <img id="modal-img" alt="Capa do filme" />
-    <div>
-      <h2 id="modal-title"></h2>
-      <p class="movie-meta" id="modal-meta"></p>
-      <p id="modal-sinopse"></p>
+    <div class="modal-content">
+      <div class="modal-heading">
+        <div>
+          <h2 id="modal-title"></h2>
+          <p class="movie-meta" id="modal-meta"></p>
+        </div>
+        <button class="modal-favorite" id="modal-favorite" type="button" aria-pressed="false">
+          <span class="favorite-symbol" aria-hidden="true">☆</span>
+          <span id="modal-favorite-text">Adicionar aos favoritos</span>
+        </button>
+      </div>
+      <p class="modal-synopsis" id="modal-sinopse"></p>
     </div>
   </dialog>
+
+  <div class="catalog-toast" id="catalog-toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="catalogo.js"></script>
 </body>

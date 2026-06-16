@@ -4,10 +4,13 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import UsuarioDAO from './daos/UsuarioDAO.js'
 import FilmeDAO from './daos/FilmeDAO.js'
+import FavoritoDAO from './daos/FavoritoDAO.js'
 import AuthController from './controllers/authController.js'
 import FilmeController from './controllers/filmeController.js'
+import FavoritoController from './controllers/favoritoController.js'
 import authRoutes from './routes/authRoutes.js'
 import filmeRoutes from './routes/filmeRoutes.js'
+import favoritoRoutes from './routes/favoritoRoutes.js'
 import { ensureBucket } from './services/minioService.js'
 
 const app = express()
@@ -22,6 +25,7 @@ app.use(express.static(path.join(__dirname, '../frontend')))
 
 const usuarioDAO = await UsuarioDAO.build()
 const filmeDAO = await FilmeDAO.build()
+const favoritoDAO = await FavoritoDAO.build()
 
 try {
   await ensureBucket()
@@ -32,9 +36,11 @@ try {
 
 const authController = new AuthController(usuarioDAO)
 const filmeController = new FilmeController(filmeDAO)
+const favoritoController = new FavoritoController(favoritoDAO, filmeDAO)
 
 app.use('/api/auth', authRoutes(authController))
 app.use('/api/filmes', filmeRoutes(filmeController))
+app.use('/api/favoritos', favoritoRoutes(favoritoController))
 
 app.post('/cadastrar', authController.cadastrar)
 app.post('/login', authController.login)
